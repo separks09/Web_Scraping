@@ -55,19 +55,33 @@ def scrape():
     # Add
     mars_data["featured_image"] = featured_image_url
 
-    # URL for fourth page to be scraped
-    facts = "https://space-facts.com/mars/"
+   # URL for fifth page to be scraped
+    hemisphere_url = "https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars"
     # Set browser
-    browser.visit(facts)
-    # Create a Beautiful Soup object for twitter.com
+    browser.visit(hemisphere_url)
+    # Create a Beautiful Soup object from usgs.gov
     html = browser.html
-    soup4 = BeautifulSoup(html, 'html.parser')
-    results = soup4.find_all("td", class_="column-1")
-    results2 = soup4.find_all("td", class_="column-2")
-    for result in results:
-        
-        facts_column.append(result.text.split(":")[0])
-    for result in results2:
-        results_column.append(result.text)
-      
+    soup5 = BeautifulSoup(html, 'html.parser')
+    # Find titles and images of Mars hemispheres from usgs.gov
+    results3 = soup5.find_all("div", class_="item")
+    # Iterate through results, storing dictionary items in list
+    hemispheres = []
+    for result in results3:
+        # Store URL to full image in variable
+        url = result.find("a")["href"].split("map")[-1]
+        image_url = "https://astropedia.astrogeology.usgs.gov/download"+url+".tif/full.jpg"
+        # Clean title and in variable
+        title = (result.find("h3").text.split(" Enhanced")[0])
+        # Create dictionary
+        hemispheres_dict = {}
+        # Store one instance of title and image
+        hemispheres_dict["title"] = title
+        hemispheres_dict["image_url"] = image_url
+        # Add key and value to dict
+        hemispheres_dict_values = hemispheres_dict
+        # Append "entire" dict to list; dict is unordered and will overwrite on next iteration
+        hemispheres.append(hemispheres_dict_values)
+    # Add    
+    mars_data["hemispheres"] = hemispheres
+
     return mars_data
